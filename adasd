@@ -1,0 +1,21 @@
+def use_offline_recognition():
+    recognized_data = ""
+    try:
+        if not os.path.exists("models/vosk-model-small-ru-0.22"):
+            # download models from https://alphacephei.com/vosk/models and unpack as 'model' in the current folder.
+            exit(1)
+
+        wave_audio_file = wave.open("microphone-results.wav", "rb")
+        model = Model("models/vosk-model-small-ru-0.4")
+        offline_recognizer = KaldiRecognizer(model, wave_audio_file.getframerate())
+
+        data = wave_audio_file.readframes(wave_audio_file.getnframes())
+        if len(data) > 0:
+            if offline_recognizer.AcceptWaveform(data):
+                recognized_data = offline_recognizer.Result()
+                recognized_data = json.loads(recognized_data)
+                recognized_data = recognized_data["text"]
+    except:
+        print("Sorry, speech service is unavailable. Try again later")
+
+    return recognized_data
